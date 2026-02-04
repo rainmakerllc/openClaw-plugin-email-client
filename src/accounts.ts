@@ -89,12 +89,22 @@ export function resolveEmailAccount(opts: {
   const baseEnabled = channelConfig?.enabled;
   const accountEnabled = merged.enabled !== false;
 
+  // Debug: log what we're checking
+  console.log(`[email] resolveEmailAccount(${accountId}):`, {
+    imapHost: merged.imapHost,
+    imapUser: merged.imapUser,
+    imapPassword: merged.imapPassword ? "[set]" : "[not set]",
+    smtpHost: merged.smtpHost,
+  });
+
   const configured = Boolean(
     merged.imapHost &&
     merged.imapUser &&
     merged.imapPassword &&
     merged.smtpHost
   );
+
+  console.log(`[email] Account ${accountId} configured: ${configured}`);
 
   return {
     accountId,

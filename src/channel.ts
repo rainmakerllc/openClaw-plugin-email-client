@@ -298,48 +298,55 @@ export const emailPlugin: ChannelPlugin<ResolvedEmailAccount> = {
       lastPollAt: null,
     },
     collectStatusIssues: (accounts) => {
+      console.log(`[email] collectStatusIssues called with ${accounts.length} accounts`);
       const issues: Array<{ channel: string; accountId: string; kind: string; message: string; fix?: string }> = [];
       for (const entry of accounts) {
+        console.log(`[email] Checking account:`, JSON.stringify(entry, null, 2));
         const account = entry as { accountId?: string; configured?: boolean; config?: { imapHost?: string; smtpHost?: string; imapUser?: string; imapPassword?: string } };
         const accountId = account?.accountId ?? "default";
-        if (!account?.config) {
-          issues.push({
-            channel: "email",
-            accountId,
-            kind: "config",
-            message: "Email account not configured",
-            fix: "Add IMAP/SMTP settings to channels.email config",
-          });
-          continue;
-        }
-        if (!account.config.imapHost) {
-          issues.push({
-            channel: "email",
-            accountId,
-            kind: "config",
-            message: "IMAP host not configured",
-            fix: "Set channels.email.imapHost",
-          });
-        }
-        if (!account.config.smtpHost) {
-          issues.push({
-            channel: "email",
-            accountId,
-            kind: "config",
-            message: "SMTP host not configured",
-            fix: "Set channels.email.smtpHost",
-          });
-        }
-        if (!account.config.imapUser || !account.config.imapPassword) {
-          issues.push({
-            channel: "email",
-            accountId,
-            kind: "config",
-            message: "IMAP credentials not configured",
-            fix: "Set channels.email.imapUser and imapPassword",
-          });
+        
+        // Use the configured flag from the account resolver
+        if (account?.configured === false) {
+          if (!account?.config?.imapHost) {
+            issues.push({
+              channel: "email",
+              accountId,
+              kind: "config",
+              message: "IMAP host not configured",
+              fix: "Set channels.email.imapHost",
+            });
+          }
+          if (!account?.config?.smtpHost) {
+            issues.push({
+              channel: "email",
+              accountId,
+              kind: "config",
+              message: "SMTP host not configured",
+              fix: "Set channels.email.smtpHost",
+            });
+          }
+          if (!account?.config?.imapUser || !account?.config?.imapPassword) {
+            issues.push({
+              channel: "email",
+              accountId,
+              kind: "config",
+              message: "IMAP credentials not configured",
+              fix: "Set channels.email.imapUser and imapPassword",
+            });
+          }
+          // Fallback generic message if no specific issues found
+          if (issues.length === 0) {
+            issues.push({
+              channel: "email",
+              accountId,
+              kind: "config",
+              message: "Email account not configured",
+              fix: "Add IMAP/SMTP settings to channels.email config",
+            });
+          }
         }
       }
+      console.log(`[email] Found ${issues.length} issues`);
       return issues;
     },
     buildChannelSummary: ({ snapshot }) => ({

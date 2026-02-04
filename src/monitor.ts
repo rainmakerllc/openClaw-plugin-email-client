@@ -67,6 +67,15 @@ export async function monitorEmailProvider(opts: MonitorOptions): Promise<void> 
   const { account, config, abortSignal, statusSink, runtime } = opts;
   const log = runtime.logger;
 
+  console.log(`[email] monitorEmailProvider starting for account: ${account.accountId}`);
+  console.log(`[email] Account config:`, {
+    imapHost: account.config.imapHost,
+    imapPort: account.config.imapPort,
+    imapUser: account.config.imapUser,
+    smtpHost: account.config.smtpHost,
+    pollIntervalSeconds: account.config.pollIntervalSeconds,
+  });
+
   const pollIntervalMs = (account.config.pollIntervalSeconds ?? 60) * 1000;
   const folder = account.config.folder ?? "INBOX";
   const maxReplies = account.config.maxRepliesPerSenderPerHour ?? 5;
@@ -78,6 +87,7 @@ export async function monitorEmailProvider(opts: MonitorOptions): Promise<void> 
   const connectWithRetry = async (): Promise<ImapFlow> => {
     while (!abortSignal.aborted) {
       try {
+        console.log(`[email] Connecting to IMAP ${account.config.imapHost}:${account.config.imapPort ?? 993}...`);
         log?.info(`[${account.accountId}] Connecting to IMAP ${account.config.imapHost}...`);
 
         client = await connectImap({
@@ -112,11 +122,20 @@ export async function monitorEmailProvider(opts: MonitorOptions): Promise<void> 
         client = await connectWithRetry();
       }
 
+      console.log(`[email] Polling for unread emails in ${folder}...`);
       log?.debug(`[${account.accountId}] Polling for unread emails in ${folder}...`);
       const emails = await fetchUnreadEmails(client, folder);
+      console.log(`[email] Found ${emails.length} unread emails`);
 
       for (const email of emails) {
         if (abortSignal.aborted) break;
+
+        console.log(`[email] Processing email:`, {
+          from: email.from,
+          subject: email.subject,
+          messageId: email.messageId,
+          date: email.date,
+        });
 
         await processEmail({
           email,
