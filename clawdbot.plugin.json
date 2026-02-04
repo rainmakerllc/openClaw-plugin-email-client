@@ -1,0 +1,16 @@
+{
+  "id": "email",
+  "name": "Email Responder",
+  "description": "IMAP/SMTP email channel - monitors inbox and sends AI-powered replies",
+  "version": "1.0.0",
+  "channels": ["email"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  },
+  "uiHints": {
+    "imapPassword": { "label": "IMAP Password", "sensitive": true },
+    "smtpPassword": { "label": "SMTP Password", "sensitive": true }
+  }
+}

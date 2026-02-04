@@ -1,0 +1,43 @@
+{
+  "name": "@clawdbot/email-responder",
+  "version": "1.0.0",
+  "description": "Email channel plugin for Clawdbot - IMAP monitoring with AI-powered responses",
+  "author": "Blockrush <https://www.blockrush.com>",
+  "homepage": "https://www.blockrush.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blockrush/clawdbot-email-responder"
+  },
+  "type": "module",
+  "main": "index.ts",
+  "clawdbot": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "channel": {
+      "id": "email",
+      "label": "Email",
+      "selectionLabel": "Email (IMAP/SMTP)",
+      "docsPath": "/channels/email",
+      "docsLabel": "email",
+      "blurb": "Monitor IMAP inbox and send AI-powered replies via SMTP.",
+      "order": 80,
+      "aliases": [
+        "mail",
+        "imap"
+      ]
+    }
+  },
+  "dependencies": {
+    "html-to-text": "^9.0.5",
+    "imapflow": "^1.0.171",
+    "mailparser": "^3.7.2",
+    "nodemailer": "^6.9.16",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/html-to-text": "^9.0.4",
+    "@types/nodemailer": "^6.4.17"
+  }
+}
